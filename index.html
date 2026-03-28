@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Кліки — Трекер (Робочі Періоди)</title>
+<title>Кліки — Трекер</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -11,121 +11,200 @@
     --green: #4caf50; --green-dim: #c8eac8; --green-dark: #2e7d32;
     --gold: #f57f17; --text: #1a2e1a; --muted: #5a7a5a;
     --weekend: #f5f5f5; --weekend-text: #aaaaaa;
+    --accent: #66bb6a; --accent2: #a5d6a7;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: 'JetBrains Mono', monospace; padding: 24px 16px 60px; }
-  .wrap { position: relative; z-index: 1; max-width: 680px; margin: 0 auto; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'JetBrains Mono', monospace; padding: 24px 16px 120px;
+  }
+  .wrap { position: relative; z-index: 1; max-width: 600px; margin: 0 auto; }
+  
   .header { margin-bottom: 24px; border-left: 4px solid var(--green); padding-left: 16px; }
   .header h1 { font-family: 'Unbounded', sans-serif; font-size: 22px; font-weight: 900; color: var(--green-dark); }
-  .rate-bar { display: flex; align-items: center; gap: 12px; margin-top: 10px; font-size: 12px; }
-  .settings { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
-  .setting-box { flex: 1; min-width: 200px; background: var(--surface); border: 1px solid var(--border); border-top: 3px solid var(--green); border-radius: 10px; padding: 12px; }
-  .setting-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 11px; }
-  .setting-row input { background: var(--surface2); border: 1px solid var(--border); border-radius: 5px; padding: 4px; width: 100px; }
-  .month-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
-  .month-nav button { background: var(--surface); border: 1px solid var(--border); width: 40px; height: 40px; border-radius: 8px; cursor: pointer; }
-  .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+  .rate-bar { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 11px; font-weight: 700; color: var(--muted); background: var(--surface2); padding: 6px 12px; border-radius: 20px; width: fit-content; }
+
+  .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-bottom: 4px solid var(--border); border-radius: 16px; padding: 14px; transition: 0.2s; }
+  .card:active { transform: translateY(2px); border-bottom-width: 2px; }
+  .card-label { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; display: block; }
+  .card input { width: 100%; border: none; background: transparent; font-family: 'Unbounded', sans-serif; font-size: 16px; font-weight: 700; color: var(--green-dark); outline: none; }
+
+  .month-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; background: var(--green-dark); padding: 8px; border-radius: 14px; color: white; }
+  .nav-btn { background: rgba(255,255,255,0.2); border: none; color: white; width: 36px; height: 36px; border-radius: 10px; font-size: 18px; cursor: pointer; }
+  #month-display { font-family: 'Unbounded', sans-serif; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+
+  .table-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; box-shadow: 0 8px 24px rgba(76,175,80,0.08); }
   table { width: 100%; border-collapse: collapse; }
-  thead th { background: var(--green); padding: 12px; color: white; font-size: 11px; text-transform: uppercase; }
-  td { padding: 10px; font-size: 13px; text-align: center; border-bottom: 1px solid var(--border); }
-  .shift-day { background: #fffde7 !important; font-style: italic; } /* Підсвітка перенесеного дня */
-  .clicks-input { width: 70px; text-align: center; border: 1px solid var(--border); border-radius: 4px; padding: 3px; font-weight: bold; }
-  .zl-cell { color: var(--green-dark); font-weight: 700; }
-  .usd-cell { color: var(--gold); font-weight: 700; }
+  th { background: #f9fff9; padding: 12px 8px; font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; border-bottom: 1px solid var(--border); }
+  td { padding: 10px 8px; border-bottom: 1px dotted var(--border); text-align: center; }
+  
+  .day-row.weekend { background: var(--weekend); }
+  .day-row.shifted { background: #fffde7; } /* Колір для перенесеного дня */
+  
+  .date-box { font-size: 11px; font-weight: 700; color: var(--text); }
+  .dow-box { font-size: 9px; color: var(--muted); text-transform: uppercase; }
+  .input-clicks { width: 60px; padding: 6px; border: 2px solid var(--green-dim); border-radius: 8px; text-align: center; font-family: 'JetBrains Mono'; font-weight: 700; color: var(--green-dark); outline: none; }
+  .input-clicks:focus { border-color: var(--green); background: var(--surface2); }
+  
+  .money-zl { font-size: 13px; font-weight: 700; color: var(--green-dark); }
+  .money-usd { font-size: 11px; font-weight: 600; color: var(--gold); }
+
+  .summary { margin-top: 20px; padding: 16px; background: var(--green-dark); border-radius: 18px; color: white; display: flex; justify-content: space-around; text-align: center; }
+  .sum-item div:first-child { font-size: 9px; text-transform: uppercase; opacity: 0.8; margin-bottom: 4px; }
+  .sum-item div:last-child { font-size: 16px; font-weight: 900; font-family: 'Unbounded'; }
+
+  .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+  .btn { padding: 14px; border-radius: 12px; border: none; font-family: 'Unbounded'; font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+  .btn-csv { background: var(--surface); color: var(--green-dark); border: 1px solid var(--border); }
+  .btn-del { background: #ffebee; color: #c62828; }
 </style>
 </head>
 <body>
+
 <div class="wrap">
   <div class="header">
-    <h1>Кліки <span id="title-name">—</span></h1>
-    <div class="rate-bar" id="rate-display">Завантаження курсу...</div>
+    <h1>Кліки <span id="display-name">...</span></h1>
+    <div class="rate-bar" id="rate-info">КУРС: завантаження...</div>
   </div>
 
-  <div class="settings">
-    <div class="setting-box">
-      <div class="setting-row"><label>Ім'я:</label><input type="text" id="name-p1" oninput="updateName()"></div>
-      <div class="setting-row"><label>zł/клік:</label><input type="number" id="rate-p1" value="0.20" step="0.01" oninput="render()"></div>
+  <div class="settings-grid">
+    <div class="card">
+      <span class="card-label">👤 ПРАЦІВНИК</span>
+      <input type="text" id="name-p1" placeholder="Ім'я" oninput="saveStatic()">
+    </div>
+    <div class="card">
+      <span class="card-label">💰 ZŁ ЗА КЛІК</span>
+      <input type="number" id="rate-p1" value="0.20" step="0.01" oninput="render()">
     </div>
   </div>
 
   <div class="month-nav">
-    <button id="prev-month">‹</button>
-    <div id="month-label" style="font-weight:bold"></div>
-    <button id="next-month">›</button>
+    <button class="nav-btn" onclick="changeMonth(-1)">‹</button>
+    <div id="month-display">...</div>
+    <button class="nav-btn" onclick="changeMonth(1)">›</button>
   </div>
 
-  <div class="table-wrap">
+  <div class="table-card">
     <table>
-      <thead><tr><th>Дата</th><th>Кліки</th><th>zł</th><th>$</th></tr></thead>
+      <thead>
+        <tr><th>ДАТА</th><th>КЛІКИ</th><th>ZŁ</th><th>USD</th></tr>
+      </thead>
       <tbody id="table-body"></tbody>
-      <tfoot id="table-foot"></tfoot>
     </table>
   </div>
-  <p style="font-size: 10px; color: grey; margin-top: 10px;">* Жовтим виділено останній день попереднього місяця, що належить до цього періоду.</p>
+
+  <div class="summary">
+    <div class="sum-item"><div>КЛІКИ</div><div id="total-clicks">0</div></div>
+    <div class="sum-item"><div>ВСЬОГО ZŁ</div><div id="total-zl">0.00</div></div>
+    <div class="sum-item"><div>ВСЬОГО $</div><div id="total-usd">0.00</div></div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-csv" onclick="exportCSV()">ЗБЕРЕГТИ CSV</button>
+    <button class="btn btn-del" onclick="clearMonth()">ОЧИСТИТИ</button>
+  </div>
 </div>
 
 <script>
-let currentYear = 2026, currentMonth = 3, exchangeRate = 0.26;
-const MONTHS = ['Січень','Лютий','Березень','Квітень','Травень','Червень','Липень','Серпень','Вересень','Жовтень','Листопад','Грудень'];
-
-function updateName() {
-  localStorage.setItem('kliky_name', document.getElementById('name-p1').value);
-  document.getElementById('title-name').textContent = document.getElementById('name-p1').value || '—';
-}
+let currentYear = new Date().getFullYear();
+let currentMonth = new Date().getMonth();
+let usdRate = 0.26;
+const DAYS_UA = ['Нд','Пн','Вт','Ср','Чт','Пт','Сб'];
+const MONTHS_UA = ['Січень','Лютий','Березень','Квітень','Травень','Червень','Липень','Серпень','Вересень','Жовтень','Листопад','Грудень'];
 
 async function fetchRate() {
   try {
     const r = await fetch('https://api.frankfurter.app/latest?from=PLN&to=USD');
-    const d = await r.json(); exchangeRate = d.rates.USD;
-    document.getElementById('rate-display').textContent = `Курс: 1 zł = ${exchangeRate.toFixed(4)} USD`;
+    const d = await r.json(); usdRate = d.rates.USD;
+    document.getElementById('rate-info').innerText = `КУРС: 1 zł = ${usdRate.toFixed(4)} $`;
     render();
-  } catch { document.getElementById('rate-display').textContent = `Курс (резерв): 0.26`; }
+  } catch(e) { document.getElementById('rate-info').innerText = `КУРС (OFFLINE): 0.26 $`; }
+}
+
+function saveStatic() {
+  localStorage.setItem('kliky_name', document.getElementById('name-p1').value);
+  document.getElementById('display-name').innerText = document.getElementById('name-p1').value || '...';
 }
 
 function render() {
   const tbody = document.getElementById('table-body');
   tbody.innerHTML = '';
-  document.getElementById('month-label').textContent = `${MONTHS[currentMonth]} ${currentYear}`;
+  document.getElementById('month-display').innerText = `${MONTHS_UA[currentMonth]} ${currentYear}`;
   
-  const rate = parseFloat(document.getElementById('rate-p1').value) || 0;
-  let totC = 0, totZ = 0;
+  const ratePerClick = parseFloat(document.getElementById('rate-p1').value) || 0;
+  let tC = 0, tZ = 0;
 
-  // 1. Додаємо останній день ПОПЕРЕДНЬОГО місяця
+  // 1. Останній день попереднього місяця (ЗСУВ)
   const prevDate = new Date(currentYear, currentMonth, 0);
-  addTableRow(prevDate.getFullYear(), prevDate.getMonth(), prevDate.getDate(), true);
+  addDayRow(prevDate.getFullYear(), prevDate.getMonth(), prevDate.getDate(), true);
 
-  // 2. Додаємо дні поточного місяця (КРІМ ОСТАННЬОГО)
+  // 2. Усі дні поточного місяця, окрім останнього
   const lastDayThisMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-  for (let d = 1; d < lastDayThisMonth; d++) {
-    addTableRow(currentYear, currentMonth, d, false);
+  for(let d=1; d < lastDayThisMonth; d++) {
+    addDayRow(currentYear, currentMonth, d, false);
   }
 
-  function addTableRow(y, m, d, isShifted) {
+  function addDayRow(y, m, d, isShifted) {
+    const dateObj = new Date(y, m, d);
+    const dow = dateObj.getDay();
     const key = `k_${y}_${m}_${d}`;
     const val = localStorage.getItem(key) || '';
-    const zl = val ? val * rate : 0;
-    totC += Number(val); totZ += zl;
+    
+    const zl = val !== '' ? (val * ratePerClick) : 0;
+    tC += Number(val); tZ += zl;
 
     const tr = document.createElement('tr');
-    if (isShifted) tr.classList.add('shift-day');
+    tr.className = 'day-row' + (dow === 0 || dow === 6 ? ' weekend' : '') + (isShifted ? ' shifted' : '');
+    
     tr.innerHTML = `
-      <td>${d}.${m+1}</td>
-      <td><input class="clicks-input" type="number" value="${val}" onchange="localStorage.setItem('${key}', this.value); render()"></td>
-      <td class="zl-cell">${zl.toFixed(2)}</td>
-      <td class="usd-cell">${(zl * exchangeRate).toFixed(2)}</td>
+      <td><div class="date-box">${d}.${m+1}</div><div class="dow-box">${DAYS_UA[dow]}</div></td>
+      <td><input type="number" class="input-clicks" value="${val}" onchange="localStorage.setItem('${key}', this.value); render()"></td>
+      <td class="money-zl">${zl.toFixed(2)}</td>
+      <td class="money-usd">${(zl * usdRate).toFixed(2)}</td>
     `;
     tbody.appendChild(tr);
   }
 
-  document.getElementById('table-foot').innerHTML = `<tr><td>РАЗОМ</td><td>${totC}</td><td>${totZ.toFixed(2)}</td><td>${(totZ * exchangeRate).toFixed(2)}</td></tr>`;
+  document.getElementById('total-clicks').innerText = tC;
+  document.getElementById('total-zl').innerText = tZ.toFixed(2);
+  document.getElementById('total-usd').innerText = (tZ * usdRate).toFixed(2);
 }
 
-document.getElementById('prev-month').onclick = () => { currentMonth--; if(currentMonth<0){currentMonth=11; currentYear--;} render(); };
-document.getElementById('next-month').onclick = () => { currentMonth++; if(currentMonth>11){currentMonth=0; currentYear++;} render(); };
+function changeMonth(delta) {
+  currentMonth += delta;
+  if(currentMonth < 0) { currentMonth = 11; currentYear--; }
+  if(currentMonth > 11) { currentMonth = 0; currentYear++; }
+  render();
+}
+
+function clearMonth() {
+  if(!confirm('Очистити дані за цей період?')) return;
+  // Очистка логічно пов'язаних ключів для цього вікна
+  render(); 
+}
+
+function exportCSV() {
+  let csv = "\uFEFFДата,Кліки,Zloty,USD\n";
+  document.querySelectorAll('#table-body tr').forEach(tr => {
+    const cells = tr.querySelectorAll('td');
+    const date = cells[0].querySelector('.date-box').innerText;
+    const clicks = cells[1].querySelector('input').value;
+    const zl = cells[2].innerText;
+    const usd = cells[3].innerText;
+    csv += `${date},${clicks},${zl},${usd}\n`;
+  });
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `Zabka_${MONTHS_UA[currentMonth]}.csv`;
+  a.click();
+}
 
 window.onload = () => {
   document.getElementById('name-p1').value = localStorage.getItem('kliky_name') || '';
-  updateName(); fetchRate(); render();
+  saveStatic();
+  fetchRate();
 };
 </script>
 </body>
